@@ -58,13 +58,18 @@ const Home = () => {
       {/* Header */}
       <header className="relative z-10 pt-8 pb-4">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3">
-            <Music className="w-8 h-8 text-primary animate-glow-pulse" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              LyricDrop
-            </h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Music className="w-8 h-8 text-foreground" />
+              <h1 className="text-4xl font-bold text-foreground">
+                LyricDrop
+              </h1>
+            </div>
+            <Button variant="outline" className="bg-background text-foreground border-foreground hover:bg-foreground hover:text-background">
+              Connect Wallet
+            </Button>
           </div>
-          <p className="text-center text-muted-foreground mt-2 text-sm">
+          <p className="text-center text-foreground/70 mt-2 text-sm">
             Turn any text into a professional song in 3 seconds
           </p>
         </div>
@@ -108,9 +113,9 @@ const Home = () => {
 
           {/* Magic button */}
           <Button
-            variant="magic"
+            variant="default"
             size="xl"
-            className="w-full"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={handleCreateSong}
             disabled={!text.trim()}
           >
