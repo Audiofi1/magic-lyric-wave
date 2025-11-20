@@ -53,10 +53,26 @@ const Home = () => {
       {/* Hero Section */}
       <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl">
         <div className="text-center mb-12">
-          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight animate-text-reveal">
-            Make any song
+          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+            {["Make", "any", "song"].map((word, i) => (
+              <span
+                key={i}
+                className="inline-block animate-text-reveal"
+                style={{ animationDelay: `${i * 0.15}s`, opacity: 0 }}
+              >
+                {word}{i < 2 && " "}
+              </span>
+            ))}
             <br />
-            you can imagine
+            {["you", "can", "imagine"].map((word, i) => (
+              <span
+                key={i}
+                className="inline-block animate-text-reveal"
+                style={{ animationDelay: `${(i + 3) * 0.15}s`, opacity: 0 }}
+              >
+                {word}{i < 2 && " "}
+              </span>
+            ))}
           </h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto animate-text-reveal-delay">
             Start with a simple prompt or dive into our pro editing tools, your next track is just a step away.
