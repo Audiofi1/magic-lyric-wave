@@ -40,12 +40,6 @@ const Home = () => {
           </div>
           <div className="flex items-center gap-3">
             <Button 
-              variant="ghost" 
-              className="text-white hover:bg-white/10"
-            >
-              Sign In
-            </Button>
-            <Button 
               variant="outline" 
               className="bg-white text-black border-0 hover:bg-white/90 font-medium"
             >
@@ -58,13 +52,13 @@ const Home = () => {
 
       {/* Hero Section */}
       <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl">
-        <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+        <div className="text-center mb-12">
+          <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight animate-text-reveal">
             Make any song
             <br />
             you can imagine
           </h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 max-w-2xl mx-auto animate-text-reveal-delay">
             Start with a simple prompt or dive into our pro editing tools, your next track is just a step away.
           </p>
         </div>
@@ -89,7 +83,7 @@ const Home = () => {
             <Button
               onClick={handleCreateSong}
               disabled={!prompt.trim()}
-              className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold px-6 h-12 rounded-xl"
+              className="bg-black hover:bg-black/80 text-white font-semibold px-6 h-12 rounded-xl border border-white/20"
             >
               <Sparkles className="w-4 h-4" />
               Create
