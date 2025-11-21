@@ -63,11 +63,11 @@ const Result = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Waveform visualization */}
-                <div className="flex items-center justify-center gap-1 h-32 bg-secondary/30 rounded-xl p-4">
+                <div className="flex items-center justify-center gap-1 h-32 bg-white/10 rounded-xl p-4">
                   {[...Array(60)].map((_, i) => (
                     <div
                       key={i}
-                      className={`w-1 bg-primary rounded-full transition-all ${
+                      className={`w-1 bg-black rounded-full transition-all ${
                         isPlaying ? "animate-wave" : ""
                       }`}
                       style={{
@@ -81,10 +81,8 @@ const Result = () => {
                 {/* Play controls */}
                 <div className="flex items-center justify-center gap-4">
                   <Button
-                    variant="magic"
-                    size="lg"
                     onClick={() => setIsPlaying(!isPlaying)}
-                    className="rounded-full w-16 h-16"
+                    className="rounded-full w-16 h-16 bg-black text-white hover:bg-black/80"
                   >
                     {isPlaying ? "⏸" : "▶"}
                   </Button>
@@ -123,7 +121,7 @@ const Result = () => {
                   <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm">
                     {genre}
                   </span>
-                  <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm">
+                  <span className="px-3 py-1 bg-accent/20 text-white rounded-full text-sm">
                     Energetic
                   </span>
                   <span className="px-3 py-1 bg-secondary text-foreground rounded-full text-sm">
@@ -179,10 +177,10 @@ const Result = () => {
                     <Shield className="w-3 h-3" />
                     License Type
                   </label>
-                  <div className="mt-1 p-3 bg-accent/10 border border-accent/30 rounded-lg">
-                    <p className="text-sm font-medium text-accent">
+                  <div className="mt-1">
+                    <Button className="w-full bg-black text-white hover:bg-black/80">
                       Open Remix License
-                    </p>
+                    </Button>
                   </div>
                 </div>
 
@@ -222,9 +220,9 @@ const Result = () => {
         {/* Bottom action */}
         <div className="mt-8 text-center">
           <Button
-            variant="magic"
             size="xl"
             onClick={() => navigate("/")}
+            className="bg-black text-white hover:bg-black/80"
           >
             <Sparkles className="w-5 h-5" />
             Create Another Song
