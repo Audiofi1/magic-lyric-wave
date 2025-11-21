@@ -43,7 +43,7 @@ const Result = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-white">
               Your Song is Ready!
             </h1>
             <p className="text-muted-foreground">Generated in {genre} style</p>
@@ -153,7 +153,7 @@ const Result = () => {
                     IP Asset ID
                   </label>
                   <div className="mt-1 p-3 bg-secondary/30 rounded-lg">
-                    <code className="text-xs text-primary break-all">
+                    <code className="text-xs text-white break-all">
                       {mockIpAssetId}
                     </code>
                   </div>

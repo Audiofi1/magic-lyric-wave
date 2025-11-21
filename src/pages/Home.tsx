@@ -57,20 +57,20 @@ const Home = () => {
             {["Make", "any", "song"].map((word, i) => (
               <span
                 key={i}
-                className="inline-block animate-text-reveal"
+                className="inline-block animate-text-reveal mr-4"
                 style={{ animationDelay: `${i * 0.15}s`, opacity: 0 }}
               >
-                {word}{i < 2 && " "}
+                {word}
               </span>
             ))}
             <br />
             {["you", "can", "imagine"].map((word, i) => (
               <span
                 key={i}
-                className="inline-block animate-text-reveal"
+                className="inline-block animate-text-reveal mr-4"
                 style={{ animationDelay: `${(i + 3) * 0.15}s`, opacity: 0 }}
               >
-                {word}{i < 2 && " "}
+                {word}
               </span>
             ))}
           </h2>
