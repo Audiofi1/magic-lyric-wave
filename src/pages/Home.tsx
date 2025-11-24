@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Music, Sparkles, Wallet } from 'lucide-react';
-import { StoryClient } from '@story-protocol/core-sdk';
 import Footer from '@/components/Footer';
 
 const Home = () => {
@@ -21,8 +20,6 @@ const Home = () => {
          handleCreateSong();
       }
    };
-
-   console.log('StoryClient instance:', StoryClient);
 
    return (
       <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
