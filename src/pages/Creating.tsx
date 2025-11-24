@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Music } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const loadingMessages = [
   "Generating melody...",
@@ -19,30 +21,65 @@ const Creating = () => {
   const { text, genre } = location.state || { text: "", genre: "Auto-vibe" };
 
   useEffect(() => {
-    // Cycle through loading messages
-    const messageInterval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
-    }, 500);
+    let messageInterval: NodeJS.Timeout;
+    let progressInterval: NodeJS.Timeout;
 
-    // Update progress
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          clearInterval(messageInterval);
-          // Navigate to result after completion
-          setTimeout(() => {
-            navigate("/result", { state: { text, genre } });
-          }, 500);
-          return 100;
-        }
-        return prev + 3.33; // 3 seconds total
-      });
-    }, 100);
+    const generateSong = async () => {
+      try {
+        // Start UI animations
+        messageInterval = setInterval(() => {
+          setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+        }, 500);
+
+        progressInterval = setInterval(() => {
+          setProgress((prev) => Math.min(prev + 2, 90));
+        }, 100);
+
+        // Generate lyrics
+        console.log('Calling generate-lyrics function...');
+        const { data: lyricsData, error: lyricsError } = await supabase.functions.invoke('generate-lyrics', {
+          body: { text, genre }
+        });
+
+        if (lyricsError) throw lyricsError;
+        console.log('Lyrics generated:', lyricsData);
+
+        // Generate music
+        console.log('Calling generate-music function...');
+        const { data: musicData, error: musicError } = await supabase.functions.invoke('generate-music', {
+          body: { lyrics: lyricsData.lyrics, genre }
+        });
+
+        if (musicError) throw musicError;
+        console.log('Music generated:', musicData);
+
+        // Complete progress
+        setProgress(100);
+        
+        // Navigate to result
+        setTimeout(() => {
+          navigate("/result", { 
+            state: { 
+              text, 
+              genre,
+              lyrics: lyricsData.lyrics,
+              audioUrl: musicData.audioUrl,
+              message: musicData.message
+            } 
+          });
+        }, 500);
+      } catch (error) {
+        console.error('Error generating song:', error);
+        toast.error('Failed to generate song. Please try again.');
+        setTimeout(() => navigate('/'), 2000);
+      }
+    };
+
+    generateSong();
 
     return () => {
-      clearInterval(messageInterval);
-      clearInterval(progressInterval);
+      if (messageInterval) clearInterval(messageInterval);
+      if (progressInterval) clearInterval(progressInterval);
     };
   }, [navigate, text, genre]);
 

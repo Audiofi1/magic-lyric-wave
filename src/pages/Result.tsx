@@ -13,21 +13,44 @@ import {
   Shield,
   Sparkles
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 
 const Result = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { text, genre } = location.state || { text: "Your amazing lyrics", genre: "Auto-vibe" };
+  const { text, genre, lyrics, audioUrl, message } = location.state || { 
+    text: "Your amazing lyrics", 
+    genre: "Auto-vibe",
+    lyrics: "No lyrics generated",
+    audioUrl: "",
+    message: ""
+  };
   
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Mock data for demonstration
   const mockIpAssetId = "0x" + Math.random().toString(16).substr(2, 40);
   const mockWalletAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb";
   const mockTimestamp = new Date().toISOString();
 
-  const generatedLyrics = `${text}\n\nIn the rhythm of the night\nWhere dreams come alive\nWe're dancing in the light\nFeeling so alive`;
+  useEffect(() => {
+    if (message) {
+      toast.info(message);
+    }
+  }, [message]);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -62,6 +85,17 @@ const Result = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Audio element */}
+                {audioUrl && (
+                  <audio 
+                    ref={audioRef} 
+                    src={audioUrl}
+                    onEnded={() => setIsPlaying(false)}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                  />
+                )}
+
                 {/* Waveform visualization */}
                 <div className="flex items-center justify-center gap-1 h-32 bg-white/10 rounded-xl p-4">
                   {[...Array(60)].map((_, i) => (
@@ -81,8 +115,9 @@ const Result = () => {
                 {/* Play controls */}
                 <div className="flex items-center justify-center gap-4">
                   <Button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className="rounded-full w-16 h-16 bg-black text-white hover:bg-black/80"
+                    onClick={togglePlay}
+                    disabled={!audioUrl}
+                    className="rounded-full w-16 h-16 bg-black text-white hover:bg-black/80 disabled:opacity-50"
                   >
                     {isPlaying ? "⏸" : "▶"}
                   </Button>
@@ -114,7 +149,7 @@ const Result = () => {
               <CardContent>
                 <div className="bg-secondary/30 rounded-xl p-6">
                   <p className="whitespace-pre-wrap text-foreground/90 leading-relaxed">
-                    {generatedLyrics}
+                    {lyrics}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4">
