@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Music, Sparkles, Wallet } from 'lucide-react';
 import Footer from '@/components/Footer';
+import inspireGif from '@/assets/inspire-explore.gif';
 
 const Home = () => {
    const [prompt, setPrompt] = useState('');
@@ -137,6 +138,18 @@ const Home = () => {
                <span>✨ Turn any text into a professional song in seconds</span>
             </div>
          </main>
+
+         {/* Inspire & Explore Section */}
+         <section className="relative w-full h-[60vh] flex items-center justify-center -mt-20">
+            <img 
+               src={inspireGif} 
+               alt="Inspire and Explore" 
+               className="absolute inset-0 w-full h-full object-cover"
+            />
+            <h3 className="relative z-10 text-5xl md:text-7xl font-bold text-white text-center">
+               Get inspire and Explore
+            </h3>
+         </section>
 
          {/* footer  */}
          <Footer />
