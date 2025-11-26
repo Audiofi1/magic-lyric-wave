@@ -70,7 +70,7 @@ const Home = () => {
          </header>
 
          {/* Hero Section */}
-         <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl">
+         <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl pb-32">
             <div className="text-center mb-1 sm:mb-12">
                <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
                   {['Make', 'any', 'song'].map((word, i) => (
@@ -140,7 +140,7 @@ const Home = () => {
          </main>
 
          {/* Inspire & Explore Section */}
-         <section className="relative w-full h-[60vh] flex items-center justify-center -mt-20">
+         <section className="relative w-full h-[60vh] flex items-center justify-center">
             <img 
                src={inspireGif} 
                alt="Inspire and Explore" 
