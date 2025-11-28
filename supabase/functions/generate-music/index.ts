@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Replicate from "https://esm.sh/replicate@0.25.2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,23 +15,42 @@ serve(async (req) => {
     const { lyrics, genre } = await req.json();
     console.log('Music generation requested for genre:', genre);
 
-    // For now, return a placeholder URL
-    // In a real implementation, this would call a music generation API like:
-    // - Suno API (requires paid subscription)
-    // - Replicate MusicGen (requires API key)
-    // - Other music generation services
+    const REPLICATE_API_KEY = Deno.env.get('REPLICATE_API_KEY');
+    if (!REPLICATE_API_KEY) {
+      throw new Error('REPLICATE_API_KEY is not configured');
+    }
+
+    const replicate = new Replicate({
+      auth: REPLICATE_API_KEY,
+    });
+
+    // Create a prompt that combines lyrics intent and genre
+    const prompt = `${genre} music, ${lyrics.substring(0, 200)}`;
     
-    // Simulating API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log('Generating music with MusicGen...');
+    const output = await replicate.run(
+      "meta/musicgen:671ac645ce5e552cc63a54a2bbff63fcf798043055d2dac5fc9e36a837eedcfb",
+      {
+        input: {
+          prompt: prompt,
+          model_version: "stereo-large",
+          duration: 30,
+          temperature: 1.0,
+          top_k: 250,
+          top_p: 0.0,
+          classifier_free_guidance: 3
+        }
+      }
+    );
 
-    // Return a placeholder response
-    // In production, replace this with actual API call
-    const mockAudioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+    console.log('Music generated successfully:', output);
+    
+    // MusicGen returns an audio URL
+    const audioUrl = Array.isArray(output) ? output[0] : output;
 
-    console.log('Returning placeholder audio URL');
     return new Response(JSON.stringify({ 
-      audioUrl: mockAudioUrl,
-      message: "Note: This is placeholder audio. Connect a music generation API (Suno/Replicate) for real AI-generated music."
+      audioUrl,
+      message: "Music generated successfully with MusicGen!"
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
