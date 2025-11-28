@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Music, Sparkles, Wallet } from 'lucide-react';
 import Footer from '@/components/Footer';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 const Home = () => {
    const [prompt, setPrompt] = useState('');
+   const [isWalletConnected, setIsWalletConnected] = useState(false);
    const navigate = useNavigate();
+
+   useEffect(() => {
+      const connected = localStorage.getItem('walletConnected') === 'true';
+      setIsWalletConnected(connected);
+   }, []);
+
+   const handleConnectWallet = () => {
+      localStorage.setItem('walletConnected', 'true');
+      setIsWalletConnected(true);
+   };
 
    const handleCreateSong = () => {
       if (prompt.trim()) {
@@ -57,13 +69,18 @@ const Home = () => {
                   </h1>
                </div>
                <div className="flex items-center gap-3">
-                  <Button
-                     variant="outline"
-                     className="bg-white text-black border-0 hover:bg-white/90 font-medium"
-                  >
-                     <Wallet className="w-4 h-4" />
-                     Connect Wallet
-                  </Button>
+                  {isWalletConnected ? (
+                     <ProfileDropdown />
+                  ) : (
+                     <Button
+                        variant="outline"
+                        className="bg-white text-black border-0 hover:bg-white/90 font-medium"
+                        onClick={handleConnectWallet}
+                     >
+                        <Wallet className="w-4 h-4" />
+                        Connect Wallet
+                     </Button>
+                  )}
                </div>
             </div>
          </header>

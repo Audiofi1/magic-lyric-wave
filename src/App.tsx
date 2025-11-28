@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Creating from './pages/Creating';
 import Result from './pages/Result';
+import Library from './pages/Library';
+import Profile from './pages/Profile';
+import Wallet from './pages/Wallet';
 import NotFound from './pages/NotFound';
 import BackgroundVideo from './components/LyricDropBackground';
 
@@ -21,6 +24,9 @@ const App = () => (
                <Route path="/" element={<Home />} />
                <Route path="/creating" element={<Creating />} />
                <Route path="/result" element={<Result />} />
+               <Route path="/library" element={<Library />} />
+               <Route path="/profile" element={<Profile />} />
+               <Route path="/wallet" element={<Wallet />} />
                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                <Route path="*" element={<NotFound />} />
             </Routes>
