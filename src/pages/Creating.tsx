@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Music } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ProfileDropdown from "@/components/ProfileDropdown";
 
 const loadingMessages = [
   "Generating melody...",
@@ -85,6 +86,19 @@ const Creating = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+      {/* Header with profile icon */}
+      <header className="absolute top-0 left-0 right-0 z-20 px-6 py-6">
+        <div className="container mx-auto flex items-center justify-between max-w-7xl">
+          <div className="flex items-center gap-2">
+            <Music className="w-7 h-7 text-white" />
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              LyricDrop
+            </h1>
+          </div>
+          <ProfileDropdown />
+        </div>
+      </header>
+
       {/* Background glow effect */}
       <div className="absolute inset-0 bg-gradient-radial from-primary/20 via-transparent to-transparent animate-glow-pulse" />
 
