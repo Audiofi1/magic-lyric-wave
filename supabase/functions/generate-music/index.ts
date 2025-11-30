@@ -15,42 +15,15 @@ serve(async (req) => {
     const { lyrics, genre } = await req.json();
     console.log('Music generation requested for genre:', genre);
 
-    const REPLICATE_API_KEY = Deno.env.get('REPLICATE_API_KEY');
-    if (!REPLICATE_API_KEY) {
-      throw new Error('REPLICATE_API_KEY is not configured');
-    }
-
-    const replicate = new Replicate({
-      auth: REPLICATE_API_KEY,
-    });
-
-    // Create a prompt that combines lyrics intent and genre
-    const prompt = `${genre} music, ${lyrics.substring(0, 200)}`;
+    // TODO: Replace with real MusicGen API when REPLICATE_API_KEY is configured
+    // Using placeholder audio URL for now
+    const audioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
     
-    console.log('Generating music with MusicGen...');
-    const output = await replicate.run(
-      "meta/musicgen:671ac645ce5e552cc63a54a2bbff63fcf798043055d2dac5fc9e36a837eedcfb",
-      {
-        input: {
-          prompt: prompt,
-          model_version: "stereo-large",
-          duration: 30,
-          temperature: 1.0,
-          top_k: 250,
-          top_p: 0.0,
-          classifier_free_guidance: 3
-        }
-      }
-    );
-
-    console.log('Music generated successfully:', output);
-    
-    // MusicGen returns an audio URL
-    const audioUrl = Array.isArray(output) ? output[0] : output;
+    console.log('Returning placeholder audio URL');
 
     return new Response(JSON.stringify({ 
       audioUrl,
-      message: "Music generated successfully with MusicGen!"
+      message: "Music generated successfully (placeholder mode)"
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
