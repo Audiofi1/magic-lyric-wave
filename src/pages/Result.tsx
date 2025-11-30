@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Result = () => {
   const location = useLocation();
@@ -28,6 +29,9 @@ const Result = () => {
   };
   
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [songSaved, setSongSaved] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Mock data for demonstration
@@ -39,7 +43,62 @@ const Result = () => {
     if (message) {
       toast.info(message);
     }
+    saveSongToDatabase();
   }, [message]);
+
+  const saveSongToDatabase = async () => {
+    if (songSaved || isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Please log in to save your song');
+        navigate('/auth');
+        return;
+      }
+
+      // Generate image for the song
+      toast.info('Generating album cover...');
+      const { data: imageData, error: imageError } = await supabase.functions.invoke(
+        'generate-song-image',
+        {
+          body: { title: text, genre }
+        }
+      );
+
+      let generatedImageUrl = "";
+      if (imageError) {
+        console.error('Failed to generate image:', imageError);
+        toast.error('Could not generate album cover');
+      } else if (imageData?.imageUrl) {
+        generatedImageUrl = imageData.imageUrl;
+        setImageUrl(generatedImageUrl);
+      }
+
+      // Save song to database
+      const { error: saveError } = await supabase
+        .from('songs')
+        .insert({
+          user_id: user.id,
+          title: text,
+          lyrics: lyrics,
+          genre: genre,
+          audio_url: audioUrl,
+          image_url: generatedImageUrl || null,
+        });
+
+      if (saveError) throw saveError;
+      
+      setSongSaved(true);
+      toast.success('Song saved to your library!');
+    } catch (error: any) {
+      console.error('Error saving song:', error);
+      toast.error('Failed to save song');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -85,6 +144,23 @@ const Result = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Album cover image */}
+                {imageUrl && (
+                  <div className="flex justify-center">
+                    <img 
+                      src={imageUrl} 
+                      alt="Album Cover" 
+                      className="w-64 h-64 rounded-xl object-cover shadow-lg"
+                    />
+                  </div>
+                )}
+                
+                {isSaving && !imageUrl && (
+                  <div className="flex justify-center items-center h-64">
+                    <p className="text-white/60">Generating album cover...</p>
+                  </div>
+                )}
+
                 {/* Audio element */}
                 {audioUrl && (
                   <audio 
