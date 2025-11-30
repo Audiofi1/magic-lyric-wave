@@ -10,28 +10,37 @@ import Library from './pages/Library';
 import Profile from './pages/Profile';
 import Wallet from './pages/Wallet';
 import NotFound from './pages/NotFound';
-import BackgroundVideo from './components/LyricDropBackground';
+import { WagmiProvider } from 'wagmi';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { config as wagmiConfig } from './config/wagmi-config';
+
+// Import RainbowKit styles
+import '@rainbow-me/rainbowkit/styles.css';
 
 const queryClient = new QueryClient();
 
 const App = () => (
    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-         <Toaster />
-         <Sonner />
-         <BrowserRouter>
-            <Routes>
-               <Route path="/" element={<Home />} />
-               <Route path="/creating" element={<Creating />} />
-               <Route path="/result" element={<Result />} />
-               <Route path="/library" element={<Library />} />
-               <Route path="/profile" element={<Profile />} />
-               <Route path="/wallet" element={<Wallet />} />
-               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-               <Route path="*" element={<NotFound />} />
-            </Routes>
-         </BrowserRouter>
-      </TooltipProvider>
+      <WagmiProvider config={wagmiConfig}>
+         <RainbowKitProvider>
+            <TooltipProvider>
+               <Toaster />
+               <Sonner />
+               <BrowserRouter>
+                  <Routes>
+                     <Route path="/" element={<Home />} />
+                     <Route path="/creating" element={<Creating />} />
+                     <Route path="/result" element={<Result />} />
+                     <Route path="/library" element={<Library />} />
+                     <Route path="/profile" element={<Profile />} />
+                     <Route path="/wallet" element={<Wallet />} />
+                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                     <Route path="*" element={<NotFound />} />
+                  </Routes>
+               </BrowserRouter>
+            </TooltipProvider>
+         </RainbowKitProvider>
+      </WagmiProvider>
    </QueryClientProvider>
 );
 

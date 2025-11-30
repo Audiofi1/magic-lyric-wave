@@ -1,37 +1,122 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Music, Sparkles, Wallet } from 'lucide-react';
+import { Music, Sparkles } from 'lucide-react';
 import Footer from '@/components/Footer';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import { WalletConnect } from '@/components/wallet-modal';
+import {
+   useAccount,
+   useWriteContract,
+   useWaitForTransactionReceipt,
+   useChainId,
+} from 'wagmi';
+import { songContractConfig } from '@/contracts/songContract';
+import { useToast } from '@/hooks/use-toast';
+import { Chain } from 'wagmi/chains';
 
 const Home = () => {
+   const { isConnected, address } = useAccount();
+   const chainId = useChainId();
+   const { toast } = useToast();
    const [prompt, setPrompt] = useState('');
-   const [isWalletConnected, setIsWalletConnected] = useState(false);
    const navigate = useNavigate();
 
-   useEffect(() => {
-      const connected = localStorage.getItem('walletConnected') === 'true';
-      setIsWalletConnected(connected);
-   }, []);
+   // Smart contract hooks
+   const {
+      data: hash,
+      writeContract,
+      isPending: isWritePending,
+      error: writeError,
+   } = useWriteContract();
 
-   const handleConnectWallet = () => {
-      localStorage.setItem('walletConnected', 'true');
-      setIsWalletConnected(true);
-   };
+   const { isLoading: isConfirming, isSuccess: isConfirmed } =
+      useWaitForTransactionReceipt({
+         hash,
+      });
 
-   const handleCreateSong = () => {
-      if (prompt.trim()) {
-         navigate('/creating', { state: { text: prompt, genre: 'Auto-vibe' } });
+   const handleCreateSong = async () => {
+      if (!prompt.trim()) return;
+
+      if (!isConnected) {
+         toast({
+            title: 'Wallet not connected',
+            description: 'Please connect your wallet to create a song',
+            variant: 'destructive',
+         });
+         return;
+      }
+
+      try {
+         // Example values - replace with your actual values or get them from form/state
+         const ipId = '0x0000000000000000000000000000000000000000'; // Replace with actual IP ID
+         const licenseTemplate = '0x0000000000000000000000000000000000000000'; // Replace with actual license template
+         const licenseTermsId = BigInt(1); // Replace with actual license terms ID
+
+         // Call smart contract
+         writeContract({
+            address: songContractConfig.address,
+            abi: songContractConfig.abi,
+            functionName: 'attachLicenseTerms',
+            args: [
+               ipId as `0x${string}`,
+               licenseTemplate as `0x${string}`,
+               licenseTermsId,
+            ],
+            account: address,
+            chain: { id: chainId, name: 'Ethereum' } as Chain,
+         });
+
+         // Show pending toast
+         toast({
+            title: 'Transaction submitted',
+            description: 'Waiting for confirmation...',
+         });
+      } catch (error) {
+         console.error('Error creating song:', error);
+         toast({
+            title: 'Transaction failed',
+            description:
+               error instanceof Error ? error.message : 'Unknown error',
+            variant: 'destructive',
+         });
       }
    };
+
+   // Handle transaction confirmation
+   if (isConfirmed && hash) {
+      toast({
+         title: 'Success!',
+         description: 'Song created and license terms attached',
+      });
+
+      // Navigate to creating page after successful transaction
+      navigate('/creating', {
+         state: {
+            text: prompt,
+            genre: 'Auto-vibe',
+            txHash: hash,
+         },
+      });
+   }
+
+   // Handle transaction error
+   if (writeError) {
+      toast({
+         title: 'Transaction Error',
+         description: writeError.message,
+         variant: 'destructive',
+      });
+   }
 
    const handleKeyPress = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && prompt.trim()) {
          handleCreateSong();
       }
    };
+
+   const isProcessing = isWritePending || isConfirming;
 
    return (
       <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
@@ -40,18 +125,14 @@ const Home = () => {
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover z-0 opacity-70" // opacity added to darken the video and let text stand out
+            className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
          >
-            {/* IMPORTANT: Replace '/path/to/your/background.mp4' with the actual path 
-               to your video file, usually placed in the 'public' folder or imported. 
-            */}
             <source src="./hero-video.mp4" type="video/mp4" />
-            {/* Fallback for older browsers */}
             Your browser does not support the video tag.
          </video>
-         {/* dark overlay  */}
+
          <div className="absolute inset-0 bg-black opacity-10 z-[10]" />
-         {/* Noise texture overlay */}
+
          <div
             className="absolute inset-0 opacity-20 mix-blend-overlay"
             style={{
@@ -59,7 +140,6 @@ const Home = () => {
             }}
          />
 
-         {/* Header */}
          <header className="relative z-10 sm:px-6 py-6">
             <div className="container mx-auto flex items-center justify-between max-w-7xl">
                <div className="flex items-center gap-2">
@@ -69,23 +149,11 @@ const Home = () => {
                   </h1>
                </div>
                <div className="flex items-center gap-3">
-                  {isWalletConnected ? (
-                     <ProfileDropdown />
-                  ) : (
-                     <Button
-                        variant="outline"
-                        className="bg-white text-black border-0 hover:bg-white/90 font-medium"
-                        onClick={handleConnectWallet}
-                     >
-                        <Wallet className="w-4 h-4" />
-                        Connect Wallet
-                     </Button>
-                  )}
+                  {isConnected ? <ProfileDropdown /> : <WalletConnect />}
                </div>
             </div>
          </header>
 
-         {/* Hero Section */}
          <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl pb-32">
             <div className="text-center mb-1 sm:mb-12">
                <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
@@ -118,7 +186,6 @@ const Home = () => {
                </p>
             </div>
 
-            {/* Input Section */}
             <div
                className="w-full max-w-2xl animate-fade-in"
                style={{ animationDelay: '0.1s' }}
@@ -129,6 +196,7 @@ const Home = () => {
                      value={prompt}
                      onChange={(e) => setPrompt(e.target.value)}
                      onKeyPress={handleKeyPress}
+                     disabled={isProcessing}
                      className="flex-1 bg-transparent border-0 text-white text-lg placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-12"
                   />
                   <Button
@@ -140,22 +208,24 @@ const Home = () => {
                   </Button>
                   <Button
                      onClick={handleCreateSong}
-                     disabled={!prompt.trim()}
-                     className="bg-black hover:bg-black/80 text-white font-semibold px-6 h-12 rounded-xl border border-white/20"
+                     disabled={!prompt.trim() || isProcessing}
+                     className="bg-black hover:bg-black/80 text-white font-semibold px-6 h-12 rounded-xl border border-white/20 disabled:opacity-50"
                   >
-                     <Sparkles className="w-4 h-4" />
-                     Create
+                     <Sparkles
+                        className={`w-4 h-4 ${
+                           isProcessing ? 'animate-spin' : ''
+                        }`}
+                     />
+                     {isProcessing ? 'Creating...' : 'Create'}
                   </Button>
                </div>
             </div>
 
-            {/* Features hint */}
             <div className="mt-8 flex items-center gap-2 text-white/60 text-sm">
                <span>✨ Turn any text into a professional song in seconds</span>
             </div>
          </main>
 
-         {/* footer  */}
          <Footer />
       </div>
    );
