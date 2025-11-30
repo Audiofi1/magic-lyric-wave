@@ -148,9 +148,10 @@ const Home = () => {
                      LyricDrop
                   </h1>
                </div>
-               <div className="flex items-center gap-3">
-                  {isConnected ? <ProfileDropdown /> : <WalletConnect />}
-               </div>
+                <div className="flex items-center gap-3">
+                   <ProfileDropdown />
+                   {isConnected && <WalletConnect />}
+                </div>
             </div>
          </header>
 

@@ -1,16 +1,114 @@
-import { User, Music, Heart, Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const profileSchema = z.object({
+  display_name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
+  bio: z.string().max(500, 'Bio too long').optional(),
+});
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState({
+    display_name: '',
+    bio: '',
+    avatar_url: '',
+  });
 
-  const stats = [
-    { label: 'Songs Created', value: '12', icon: Music },
-    { label: 'Total Likes', value: '248', icon: Heart },
-    { label: 'Achievements', value: '5', icon: Award },
-  ];
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setProfile({
+          display_name: data.display_name || '',
+          bio: data.bio || '',
+          avatar_url: data.avatar_url || '',
+        });
+      }
+    } catch (error: any) {
+      toast.error('Failed to load profile');
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      profileSchema.parse({
+        display_name: profile.display_name,
+        bio: profile.bio || '',
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          display_name: profile.display_name,
+          bio: profile.bio,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      toast.success('Profile updated successfully!');
+      setIsEditing(false);
+    } catch (error: any) {
+      toast.error('Failed to update profile');
+      console.error('Error updating profile:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/auth');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -28,20 +126,38 @@ const Profile = () => {
               <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
                 <User className="w-12 h-12 text-white" />
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Music Creator</h2>
-                <p className="text-white/60">Member since January 2024</p>
+              <div className="flex-1">
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="displayName" className="text-white">Display Name</Label>
+                      <Input
+                        id="displayName"
+                        value={profile.display_name}
+                        onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
+                        className="bg-white/5 border-white/20 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bio" className="text-white">Bio</Label>
+                      <Textarea
+                        id="bio"
+                        value={profile.bio}
+                        onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                        className="bg-white/5 border-white/20 text-white"
+                        placeholder="Tell us about yourself..."
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-2xl font-bold text-white mb-2">
+                      {profile.display_name || 'Music Creator'}
+                    </h2>
+                    <p className="text-white/60">{profile.bio || 'No bio yet'}</p>
+                  </>
+                )}
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {stats.map((stat) => (
-                <div key={stat.label} className="bg-white/5 rounded-lg p-4">
-                  <stat.icon className="w-6 h-6 text-white/60 mb-2" />
-                  <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                  <p className="text-white/60 text-sm">{stat.label}</p>
-                </div>
-              ))}
             </div>
           </CardContent>
         </Card>
@@ -51,11 +167,41 @@ const Profile = () => {
             <CardTitle className="text-white">Account Settings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full bg-white/5 text-white border-white/20">
-              Edit Profile
-            </Button>
-            <Button variant="outline" className="w-full bg-white/5 text-white border-white/20">
-              Notification Settings
+            {isEditing ? (
+              <>
+                <Button 
+                  onClick={handleSave}
+                  className="w-full bg-white text-black hover:bg-white/90"
+                  disabled={saving}
+                >
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setIsEditing(false);
+                    loadProfile();
+                  }}
+                  variant="outline" 
+                  className="w-full bg-white/5 text-white border-white/20"
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={() => setIsEditing(true)}
+                variant="outline" 
+                className="w-full bg-white/5 text-white border-white/20"
+              >
+                Edit Profile
+              </Button>
+            )}
+            <Button 
+              onClick={handleLogout}
+              variant="outline" 
+              className="w-full bg-white/5 text-white border-white/20"
+            >
+              Log Out
             </Button>
           </CardContent>
         </Card>
