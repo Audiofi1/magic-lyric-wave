@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { User, Library, Wallet, UserCircle, LogIn } from 'lucide-react';
+import { User, Library, Wallet, UserCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -8,44 +7,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 
 const ProfileDropdown = () => {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    checkAuth();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setIsAuthenticated(!!session);
-    setLoading(false);
-  };
-
-  if (loading) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <Button
-        onClick={() => navigate('/auth')}
-        className="bg-white text-black hover:bg-white/90"
-      >
-        <LogIn className="w-4 h-4 mr-2" />
-        Sign In
-      </Button>
-    );
-  }
 
   return (
     <DropdownMenu>

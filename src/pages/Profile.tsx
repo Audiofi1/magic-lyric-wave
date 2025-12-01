@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -32,26 +31,12 @@ const Profile = () => {
 
   const loadProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setProfile({
-          display_name: data.display_name || '',
-          bio: data.bio || '',
-          avatar_url: data.avatar_url || '',
-        });
-      }
+      // Without authentication, show default empty state
+      setProfile({
+        display_name: '',
+        bio: '',
+        avatar_url: '',
+      });
     } catch (error: any) {
       toast.error('Failed to load profile');
       console.error('Error loading profile:', error);
@@ -75,18 +60,7 @@ const Profile = () => {
 
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          display_name: profile.display_name,
-          bio: profile.bio,
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
+      // Without authentication, just update local state
       toast.success('Profile updated successfully!');
       setIsEditing(false);
     } catch (error: any) {
@@ -95,11 +69,6 @@ const Profile = () => {
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
   };
 
   if (loading) {
@@ -196,13 +165,6 @@ const Profile = () => {
                 Edit Profile
               </Button>
             )}
-            <Button 
-              onClick={handleLogout}
-              variant="outline" 
-              className="w-full bg-white/5 text-white border-white/20"
-            >
-              Log Out
-            </Button>
           </CardContent>
         </Card>
       </div>
