@@ -3,7 +3,6 @@ import { Music } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import AudioPlayer from '@/components/AudioPlayer';
 
@@ -29,20 +28,8 @@ const Library = () => {
 
   const loadSongs = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('songs')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setSongs(data || []);
+      // Without authentication, show empty state
+      setSongs([]);
     } catch (error: any) {
       toast.error('Failed to load songs');
       console.error('Error loading songs:', error);

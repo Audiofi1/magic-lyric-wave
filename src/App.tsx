@@ -9,7 +9,6 @@ import Result from './pages/Result';
 import Library from './pages/Library';
 import Profile from './pages/Profile';
 import Wallet from './pages/Wallet';
-import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
@@ -30,7 +29,6 @@ const App = () => (
                <BrowserRouter>
                    <Routes>
                       <Route path="/" element={<Home />} />
-                      <Route path="/auth" element={<Auth />} />
                       <Route path="/creating" element={<Creating />} />
                       <Route path="/result" element={<Result />} />
                       <Route path="/library" element={<Library />} />
