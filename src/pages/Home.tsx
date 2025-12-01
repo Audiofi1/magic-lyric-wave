@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Music, Sparkles } from 'lucide-react';
@@ -49,7 +50,6 @@ const Home = () => {
       }
 
       try {
-         // Example values - replace with your actual values or get them from form/state
          const ipId = '0x0000000000000000000000000000000000000000'; // Replace with actual IP ID
          const licenseTemplate = '0x0000000000000000000000000000000000000000'; // Replace with actual license template
          const licenseTermsId = BigInt(1); // Replace with actual license terms ID
@@ -90,8 +90,6 @@ const Home = () => {
          title: 'Success!',
          description: 'Song created and license terms attached',
       });
-
-      // Navigate to creating page after successful transaction
       navigate('/creating', {
          state: {
             text: prompt,
@@ -117,6 +115,7 @@ const Home = () => {
    };
 
    const isProcessing = isWritePending || isConfirming;
+   console.log('data>>>>>>', hash);
 
    return (
       <div className="h-screen bg-gradient-hero relative overflow-hidden">
@@ -148,14 +147,14 @@ const Home = () => {
                      LyricDrop
                   </h1>
                </div>
-                <div className="flex items-center gap-3">
-                   <ProfileDropdown />
-                   {isConnected && <WalletConnect />}
-                </div>
+               <div className="flex items-center gap-3">
+                  <ProfileDropdown />
+                  {isConnected && <WalletConnect />}
+               </div>
             </div>
          </header>
 
-         <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl pb-32">
+         <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl md:pb-[3rem] sm:pb-32">
             <div className="text-center mb-1 sm:mb-12">
                <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                   {['Make', 'any', 'song'].map((word, i) => (
