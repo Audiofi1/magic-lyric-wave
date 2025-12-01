@@ -148,8 +148,7 @@ const Home = () => {
                   </h1>
                </div>
                <div className="flex items-center gap-3">
-                  <ProfileDropdown />
-                  {isConnected && <WalletConnect />}
+                  {isConnected ? <ProfileDropdown /> : <WalletConnect />}
                </div>
             </div>
          </header>
