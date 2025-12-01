@@ -119,7 +119,7 @@ const Home = () => {
    const isProcessing = isWritePending || isConfirming;
 
    return (
-      <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+      <div className="h-screen bg-gradient-hero relative overflow-hidden">
          <video
             autoPlay
             loop
@@ -157,7 +157,7 @@ const Home = () => {
 
          <main className="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] max-w-4xl pb-32">
             <div className="text-center mb-1 sm:mb-12">
-               <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+               <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                   {['Make', 'any', 'song'].map((word, i) => (
                      <span
                         key={i}
