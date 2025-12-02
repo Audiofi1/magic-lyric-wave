@@ -17,11 +17,13 @@ import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import ProfileDropdown from '@/components/ProfileDropdown';
 import { useAccount } from 'wagmi';
+import { useMyContext } from '@/context/MyContext';
 
 const Result = () => {
    const { address } = useAccount();
    const location = useLocation();
    const navigate = useNavigate();
+   const { myData } = useMyContext();
    const { text, genre, lyrics, audioUrl, message } = location.state || {
       text: 'Your amazing lyrics',
       genre: 'Auto-vibe',
@@ -37,8 +39,8 @@ const Result = () => {
    const audioRef = useRef<HTMLAudioElement>(null);
 
    // Mock data for demonstration
-   const mockIpAssetId = '0x' + Math.random().toString(16).substr(2, 40);
-   const mockTimestamp = new Date().toISOString();
+   const mockIpAssetId = myData.txHash;
+   const mockTimestamp = Date.now();
 
    useEffect(() => {
       if (message) {
