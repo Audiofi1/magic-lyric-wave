@@ -1,0 +1,18 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "contract",
+    "edit/edt-8cf7a19e-db8b-4219-9da9-3a387c3e8e4d",
+    "main"
+  ],
+  "parent": {
+    "contract": "main",
+    "edit/edt-8cf7a19e-db8b-4219-9da9-3a387c3e8e4d": "main",
+    "main": null
+  },
+  "order": [
+    "main",
+    "contract",
+    "edit/edt-8cf7a19e-db8b-4219-9da9-3a387c3e8e4d"
+  ]
+}

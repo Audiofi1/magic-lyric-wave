@@ -14,6 +14,7 @@ import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { config as wagmiConfig } from './config/wagmi-config';
 import { Providers } from './Providers';
+import { MyProvider } from './context/MyContext';
 
 // Import RainbowKit styles
 import '@rainbow-me/rainbowkit/styles.css';
@@ -21,24 +22,26 @@ import '@rainbow-me/rainbowkit/styles.css';
 const queryClient = new QueryClient();
 
 const App = () => (
-  <Providers>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/creating" element={<Creating />} />
-          <Route path="/result" element={<Result />} />
-          <Route path="/library" element={<Library />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/wallet" element={<Wallet />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </Providers>
+   <Providers>
+      <TooltipProvider>
+         <Toaster />
+         <Sonner />
+         <MyProvider>
+            <BrowserRouter>
+               <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/creating" element={<Creating />} />
+                  <Route path="/result" element={<Result />} />
+                  <Route path="/library" element={<Library />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/wallet" element={<Wallet />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+               </Routes>
+            </BrowserRouter>
+         </MyProvider>
+      </TooltipProvider>
+   </Providers>
 );
 
 export default App;
